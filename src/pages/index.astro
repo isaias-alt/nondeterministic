@@ -1,11 +1,78 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import { getCollection, getEntry } from 'astro:content';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const allPosts = await getCollection('posts', ({ data }) => !import.meta.env.PROD || !data.draft);
+const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const seriesTitleById = new Map<string, string>();
+for (const post of posts) {
+	if (!post.data.series) continue;
+	const series = await getEntry(post.data.series);
+	if (series) seriesTitleById.set(post.id, series.data.title);
+}
+
+const postsByYear = new Map<number, typeof posts>();
+for (const post of posts) {
+	const year = post.data.pubDate.getFullYear();
+	if (!postsByYear.has(year)) postsByYear.set(year, []);
+	postsByYear.get(year)!.push(post);
+}
+const years = [...postsByYear.keys()].sort((a, b) => b - a);
+
+// pubDate is a date-only value (YYYY-MM-DD); format in UTC so the calendar
+// day doesn't shift with the viewer's local timezone.
+const formatDate = (date: Date) =>
+	date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', timeZone: 'UTC' });
 ---
 
-<Layout>
-	<Welcome />
+<Layout
+	title="nondeterministic"
+	description="Notes on building software. Frontend, backend, and the decisions in between. No guarantees on output order."
+	ogImage="/og/home.png"
+>
+	<div class="mx-auto max-w-[780px] px-6">
+		<div class="pt-[clamp(56px,10vh,96px)] pb-2">
+			<h1 class="font-archivo text-[clamp(34px,6vw,52px)] leading-[1.02] font-extrabold tracking-[-0.035em] text-bone">
+				nondeterministic<span class="text-steel">.</span>
+			</h1>
+			<p class="mt-4 max-w-[52ch] text-[15px] text-fog">
+				Notes on building software. Frontend, backend, and the decisions in
+				between. No guarantees on output order.
+			</p>
+		</div>
+
+		<div class="pt-10 pb-6">
+			{
+				years.map((year) => (
+					<div>
+						<span class="block border-b border-line py-2.5 pt-6 font-mono text-xs tracking-[0.05em] text-steel-dim-text">
+							{year}
+						</span>
+						{postsByYear.get(year)!.map((post) => (
+							<a
+								href={`/${post.id}`}
+								class="group flex items-baseline gap-5 border-b border-line py-4 no-underline text-inherit transition-[padding-left] duration-200 ease-out hover:pl-2"
+							>
+								<span class="min-w-[74px] font-mono text-xs whitespace-nowrap text-fog max-[640px]:min-w-[64px]">
+									{formatDate(post.data.pubDate)}
+								</span>
+								<div class="flex-1">
+									<div class="font-archivo text-[19px] leading-[1.25] font-semibold tracking-[-0.02em] text-bone transition-colors duration-150 group-hover:text-steel-text">
+										{post.data.title}
+									</div>
+									<div class="mt-1 text-sm leading-[1.5] text-fog">{post.data.description}</div>
+									{seriesTitleById.has(post.id) && (
+										<span class="mt-2 inline-block rounded-sm border border-steel-dim px-1.5 py-0.5 font-mono text-[10px] tracking-[0.06em] text-steel-text uppercase">
+											Series · {seriesTitleById.get(post.id)}
+										</span>
+									)}
+								</div>
+							</a>
+						))}
+					</div>
+				))
+			}
+		</div>
+	</div>
 </Layout>

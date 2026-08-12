@@ -1,0 +1,62 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+
+export async function getStaticPaths() {
+	const allSeries = await getCollection('series');
+	const allPosts = await getCollection('posts', ({ data }) => !import.meta.env.PROD || !data.draft);
+
+	// A series with no qualifying posts (e.g. all its posts are draft) has
+	// nothing to land on and shouldn't get a page.
+	return allSeries
+		.filter((series) => allPosts.some((post) => post.data.series?.id === series.id))
+		.map((series) => ({ params: { slug: series.id }, props: { series } }));
+}
+
+const { series } = Astro.props;
+
+const allPosts = await getCollection('posts', ({ data }) => !import.meta.env.PROD || !data.draft);
+const posts = allPosts
+	.filter((post) => post.data.series?.id === series.id)
+	.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+---
+
+<Layout title={`${series.data.title} - nondeterministic`} description={series.data.description}>
+	<div class="mx-auto max-w-[780px] px-6">
+		<div class="pt-[clamp(48px,8vh,80px)]">
+			<div class="mb-4 font-mono text-xs tracking-[0.06em] text-steel-text uppercase">
+				Series · {posts.length} {posts.length === 1 ? 'part' : 'parts'}
+			</div>
+			<h1 class="font-archivo text-[clamp(32px,5.5vw,48px)] leading-[1.04] font-extrabold tracking-[-0.035em] text-bone">
+				{series.data.title}
+			</h1>
+			<p class="mt-4 max-w-[56ch] text-base text-fog">{series.data.description}</p>
+		</div>
+
+		<div class="mt-8 mb-2 aspect-[21/9] overflow-hidden rounded-[3px] border border-line">
+			<Image src={series.data.cover} alt={series.data.title} class="h-full w-full object-cover" />
+		</div>
+
+		<div class="py-6">
+			{
+				posts.map((post, index) => (
+					<a
+						href={`/${post.id}`}
+						class="group flex items-baseline gap-[18px] border-b border-line py-4 no-underline text-inherit transition-[padding-left] duration-200 hover:pl-2"
+					>
+						<span class="min-w-7 font-mono text-[13px] text-steel-text">
+							{String(index + 1).padStart(2, '0')}
+						</span>
+						<div>
+							<div class="font-archivo text-lg font-semibold tracking-[-0.02em] text-bone transition-colors duration-150 group-hover:text-steel-text">
+								{post.data.title}
+							</div>
+							<div class="mt-[3px] text-[13.5px] text-fog">{post.data.description}</div>
+						</div>
+					</a>
+				))
+			}
+		</div>
+	</div>
+</Layout>

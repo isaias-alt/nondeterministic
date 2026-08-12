@@ -1,23 +1,58 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+	title?: string;
+	description?: string;
+	ogImage?: string;
+	type?: 'website' | 'article';
+	jsonLd?: Record<string, unknown>;
+}
+
+const {
+	title = 'nondeterministic',
+	description,
+	ogImage,
+	type = 'website',
+	jsonLd
+} = Astro.props;
+
+const ogImageUrl = ogImage ? new URL(ogImage, Astro.site) : undefined;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="en" class="[color-scheme:dark]">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/png" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>{title}</title>
+		<link rel="canonical" href={canonicalUrl.href} />
+		{description && <meta name="description" content={description} />}
+
+		<meta property="og:type" content={type} />
+		<meta property="og:title" content={title} />
+		<meta property="og:url" content={canonicalUrl.href} />
+		<meta property="og:site_name" content="nondeterministic" />
+		{description && <meta property="og:description" content={description} />}
+		{ogImageUrl && <meta property="og:image" content={ogImageUrl.href} />}
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		{description && <meta name="twitter:description" content={description} />}
+		{ogImageUrl && <meta name="twitter:image" content={ogImageUrl.href} />}
+
+		{jsonLd && <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />}
 	</head>
-	<body>
-		<slot />
+	<body class="bg-bg text-base leading-[1.6] text-bone antialiased font-inter">
+		<Nav />
+		<main class="animate-fade-in">
+			<slot />
+		</main>
+		<Footer />
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>

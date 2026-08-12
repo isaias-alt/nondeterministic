@@ -1,0 +1,19 @@
+---
+const { pathname } = Astro.url;
+const isPostsActive = pathname === '/';
+const linkClass = 'font-mono text-[13px] text-fog no-underline transition-colors duration-150 hover:text-bone';
+---
+
+<nav class="sticky top-0 z-50 border-b border-line bg-[rgba(14,16,18,0.72)] backdrop-blur-[10px]">
+	<div class="mx-auto flex max-w-[780px] items-center justify-between px-6 py-4">
+		<a href="/" class="font-mono text-sm font-medium tracking-[-0.01em] text-bone no-underline">
+			nondeterministic
+		</a>
+		<div class="flex gap-[22px]">
+			<a href="/" class={`${linkClass} ${isPostsActive ? 'text-bone' : ''}`}>posts</a>
+			<a href="https://lucasco.dev" target="_blank" rel="noopener noreferrer" class={linkClass}>
+				whoami
+			</a>
+		</div>
+	</div>
+</nav>
