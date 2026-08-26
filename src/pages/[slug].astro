@@ -1,26 +1,29 @@
 ---
-import { getCollection, render } from 'astro:content';
-import { Image } from 'astro:assets';
-import Layout from '../layouts/Layout.astro';
-import { estimateReadingMinutes } from '../lib/reading-time';
+import { getCollection, render } from "astro:content";
+import { Image } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+import { estimateReadingMinutes } from "../lib/reading-time";
 
 export async function getStaticPaths() {
-	const posts = await getCollection('posts', ({ data }) => !import.meta.env.PROD || !data.draft);
-	return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const posts = await getCollection(
+    "posts",
+    ({ data }) => !import.meta.env.PROD || !data.draft,
+  );
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 
 const { post } = Astro.props;
 const { Content } = await render(post);
 
-const readingMinutes = estimateReadingMinutes(post.body ?? '');
+const readingMinutes = estimateReadingMinutes(post.body ?? "");
 
 // pubDate is a date-only value (YYYY-MM-DD); format in UTC so the calendar
 // day doesn't shift with the viewer's local timezone.
-const longDate = post.data.pubDate.toLocaleDateString('en-US', {
-	month: 'short',
-	day: 'numeric',
-	year: 'numeric',
-	timeZone: 'UTC'
+const longDate = post.data.pubDate.toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
 });
 
 const editUrl = `https://github.com/isaias-alt/nondeterministic/edit/develop/${post.filePath}`;
@@ -29,85 +32,100 @@ const postUrl = new URL(Astro.url.pathname, Astro.site).href;
 const ogImageUrl = new URL(`/og/${post.id}.png`, Astro.site).href;
 
 const jsonLd = {
-	'@context': 'https://schema.org',
-	'@type': 'BlogPosting',
-	headline: post.data.title,
-	description: post.data.description,
-	datePublished: post.data.pubDate.toISOString(),
-	dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
-	url: postUrl,
-	image: ogImageUrl,
-	mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
-	author: { '@type': 'Person', name: 'Lucas Casco', url: 'https://lucasco.dev' },
-	publisher: { '@type': 'Person', name: 'Lucas Casco' }
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  url: postUrl,
+  image: ogImageUrl,
+  mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
+  author: {
+    "@type": "Person",
+    name: "Lucas Casco",
+    url: "https://lucasco.dev",
+  },
+  publisher: { "@type": "Person", name: "Lucas Casco" },
 };
 ---
 
 <Layout
-	title={`${post.data.title} - nondeterministic`}
-	description={post.data.description}
-	ogImage={`/og/${post.id}.png`}
-	type="article"
-	jsonLd={jsonLd}
+  title={`${post.data.title} - nondeterministic`}
+  description={post.data.description}
+  ogImage={`/og/${post.id}.png`}
+  type="article"
+  jsonLd={jsonLd}
 >
-	<div class="mx-auto max-w-[780px] px-6">
-		<div class="pt-[clamp(48px,8vh,80px)]">
-			<div class="mb-7 font-mono text-xs text-fog">
-				<a href="/" class="border-b border-steel-dim pb-px text-steel-text no-underline">
-					← posts
-				</a>
-			</div>
-			<h1 class="font-archivo text-[clamp(30px,5vw,44px)] leading-[1.06] font-extrabold tracking-[-0.035em] text-bone">
-				{post.data.title}
-			</h1>
-			<div class="mt-5 flex flex-wrap gap-4 border-b border-line pb-7 font-mono text-xs text-fog">
-				<span>{longDate}</span><span class="text-steel-dim-text">/</span>
-				<span>{readingMinutes} min read</span>
-			</div>
-		</div>
+  <div class="mx-auto max-w-195 px-6">
+    <div class="pt-[clamp(48px,8vh,80px)]">
+      <div class="mb-7 font-mono text-xs text-fog">
+        <a
+          href="/"
+          class="border-b border-steel-dim pb-px text-steel-text no-underline"
+        >
+          ← posts
+        </a>
+      </div>
+      <h1
+        class="font-archivo text-[clamp(30px,5vw,44px)] leading-[1.06] font-extrabold tracking-[-0.035em] text-bone"
+      >
+        {post.data.title}
+      </h1>
+      <div
+        class="mt-5 flex flex-wrap gap-4 border-b border-line pb-7 font-mono text-xs text-fog"
+      >
+        <span>{longDate}</span><span class="text-steel-dim-text">/</span>
+        <span>{readingMinutes} min read</span>
+      </div>
+    </div>
 
-		{
-			post.data.cover && (
-				<div class="my-8 aspect-video overflow-hidden rounded-[3px] border border-line">
-					<Image src={post.data.cover} alt={post.data.title} class="h-full w-full object-cover" />
-				</div>
-			)
-		}
+    {
+      post.data.cover && (
+        <div class="my-8 aspect-video overflow-hidden rounded-[3px] border border-line">
+          <Image
+            src={post.data.cover}
+            alt={post.data.title}
+            class="h-full w-full object-cover"
+          />
+        </div>
+      )
+    }
 
-		<div class="max-w-[68ch] pt-3">
-			<Content />
-		</div>
+    <div class="max-w-[68ch] pt-3">
+      <Content />
+    </div>
 
-		<div class="mt-2 border-t border-line pt-6">
-			<a
-				href={editUrl}
-				target="_blank"
-				rel="noopener noreferrer"
-				class="border-b border-steel-dim pb-px font-mono text-[13px] text-steel-text no-underline hover:border-steel"
-			>
-				Edit on GitHub
-			</a>
-		</div>
-	</div>
+    <div class="mt-2 border-t border-line pt-6">
+      <a
+        href={editUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="border-b border-steel-dim pb-px font-mono text-[13px] text-steel-text no-underline hover:border-steel"
+      >
+        Edit on GitHub
+      </a>
+    </div>
+  </div>
 </Layout>
 
 <script>
-	document.addEventListener('click', (event) => {
-		const target = event.target;
-		if (!(target instanceof Element)) return;
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
 
-		const button = target.closest<HTMLButtonElement>('[data-code-copy]');
-		if (!button) return;
+    const button = target.closest<HTMLButtonElement>("[data-code-copy]");
+    if (!button) return;
 
-		const block = button.closest('[data-code-block]');
-		const code = block?.querySelector('pre code');
-		if (!code?.textContent) return;
+    const block = button.closest("[data-code-block]");
+    const code = block?.querySelector("pre code");
+    if (!code?.textContent) return;
 
-		navigator.clipboard.writeText(code.textContent).catch(() => {});
-		const original = button.textContent;
-		button.textContent = 'copied';
-		setTimeout(() => {
-			button.textContent = original;
-		}, 1500);
-	});
+    navigator.clipboard.writeText(code.textContent).catch(() => {});
+    const original = button.textContent;
+    button.textContent = "copied";
+    setTimeout(() => {
+      button.textContent = original;
+    }, 1500);
+  });
 </script>
