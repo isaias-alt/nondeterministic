@@ -2,6 +2,8 @@
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import GoogleAnalytics from "../components/GoogleAnalytics.astro";
+import JsonLd from "../components/JsonLd.astro";
 
 interface Props {
   title?: string;
@@ -46,15 +48,9 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
     {description && <meta name="twitter:description" content={description} />}
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl.href} />}
 
-    {
-      jsonLd && (
-        <script
-          type="application/ld+json"
-          is:inline
-          set:html={JSON.stringify(jsonLd)}
-        />
-      )
-    }
+    <JsonLd data={jsonLd} />
+
+    <GoogleAnalytics />
   </head>
   <body class="bg-bg text-base leading-[1.6] text-bone antialiased font-inter">
     <Nav />
