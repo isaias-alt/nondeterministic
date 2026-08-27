@@ -17,8 +17,11 @@ post tras post, sin depender de la memoria automática entre chats.
   paleta Concrete del portafolio). Reconociblemente de la misma marca, pero NO el
   near-black del fondo de página, para que la ilustración no se mimetice.
 - **Técnica:** line-art puro. Solo contornos, NUNCA relleno de color en las formas.
-- **Stroke:** 2.5px, `stroke-linecap="round"`, `stroke-linejoin="round"`.
-- **Tipografía:** mono (JetBrains Mono), en itálica, para los conceptos/labels.
+- **Stroke:** 1px en los contornos de cajas/formas cerradas (rects, círculos de
+  contenido); 2.5px en líneas, flechas y conectores. `stroke-linecap="round"`,
+  `stroke-linejoin="round"` en todos los casos.
+- **Tipografía:** mono (JetBrains Mono), sin itálica, `font-weight="300"`, para
+  los conceptos/labels.
 - **Sin gradientes, sin sombras, sin texturas.**
 
 ## Paleta de acentos (fija)

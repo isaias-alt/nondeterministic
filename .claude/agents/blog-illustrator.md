@@ -31,8 +31,10 @@ cuestionarla solo si la forma visual que propone no es la mejor para el concepto
 
 # Reglas duras (del spec, resumidas — el spec manda)
 
-- Fondo `#141C24`. Line-art puro, sin relleno en las formas. Stroke 2.5px, caps
-  y joins redondeados. Tipografía mono itálica para los conceptos.
+- Fondo `#141C24`. Line-art puro, sin relleno en las formas. Stroke 1px en
+  cajas/formas cerradas, 2.5px en líneas/flechas/conectores, caps y joins
+  redondeados. Tipografía mono, sin itálica, `font-weight="300"`, para los
+  conceptos.
 - Acentos fijos: `#9FB8CE` estructura, `#C9D67B` categoría A, `#E0A45C`
   categoría B, `#4EC8A0` foco, `#E8E6E1` texto de máximo contraste.
 - Alcance: conceptos abstractos y objetos icónicos simples. NO escenas con

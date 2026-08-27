@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
+import ArrowLeftIcon from "../components/ArrowLeftIcon.astro";
 import { estimateReadingMinutes } from "../lib/reading-time";
 
 export async function getStaticPaths() {
@@ -20,6 +21,13 @@ const readingMinutes = estimateReadingMinutes(post.body ?? "");
 // pubDate is a date-only value (YYYY-MM-DD); format in UTC so the calendar
 // day doesn't shift with the viewer's local timezone.
 const longDate = post.data.pubDate.toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+const longUpdatedDate = post.data.updatedDate?.toLocaleDateString("en-US", {
   month: "short",
   day: "numeric",
   year: "numeric",
@@ -62,9 +70,10 @@ const jsonLd = {
       <div class="mb-7 font-mono text-xs text-fog">
         <a
           href="/"
-          class="border-b border-steel-dim pb-px text-steel-text no-underline"
+          class="inline-flex items-center gap-1 border-b border-steel-dim pb-px text-steel-text no-underline"
         >
-          ← posts
+          <ArrowLeftIcon class="h-3.5 w-3.5" />
+          posts
         </a>
       </div>
       <h1
@@ -77,6 +86,14 @@ const jsonLd = {
       >
         <span>{longDate}</span><span class="text-steel-dim-text">/</span>
         <span>{readingMinutes} min read</span>
+        {
+          longUpdatedDate && (
+            <>
+              <span class="text-steel-dim-text">/</span>
+              <span>Updated {longUpdatedDate}</span>
+            </>
+          )
+        }
       </div>
     </div>
 
