@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/javascript-secret-superpower",
+      "destination": "/your-code-doesnt-run-in-the-order-you-wrote-it",
+      "permanent": true
+    }
+  ]
+}

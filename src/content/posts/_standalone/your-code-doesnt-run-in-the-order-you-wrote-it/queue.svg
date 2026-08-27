@@ -1,0 +1,38 @@
+<svg viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace">
+  <rect x="0" y="0" width="680" height="380" rx="10" fill="#141C24" />
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#9FB8CE" />
+    </marker>
+  </defs>
+
+  <!-- boundary: language / runtime -->
+  <text font-weight="300" x="165" y="50" text-anchor="middle" font-size="12" fill="#9FB8CE" opacity="0.7">language</text>
+  <text font-weight="300" x="530" y="50" text-anchor="middle" font-size="12" fill="#9FB8CE" opacity="0.7">runtime</text>
+
+  <line x1="350" y1="62" x2="350" y2="120" stroke="#9FB8CE" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 10" />
+  <line x1="350" y1="170" x2="350" y2="235" stroke="#9FB8CE" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 10" />
+
+  <rect x="60" y="110" width="210" height="70" rx="10" fill="none" stroke="#C9D67B" stroke-width="1" />
+  <text font-weight="300" x="165" y="150" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#C9D67B">your code, one thread</text>
+
+  <rect x="430" y="70" width="200" height="40" rx="8" fill="none" stroke="#E0A45C" stroke-width="1" />
+  <text font-weight="300" x="530" y="90" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#E0A45C">fetch</text>
+
+  <rect x="430" y="125" width="200" height="40" rx="8" fill="none" stroke="#E0A45C" stroke-width="1" />
+  <text font-weight="300" x="530" y="145" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#E0A45C">setTimeout</text>
+
+  <rect x="430" y="180" width="200" height="40" rx="8" fill="none" stroke="#E0A45C" stroke-width="1" />
+  <text font-weight="300" x="530" y="200" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#E0A45C">the DOM</text>
+
+  <line x1="280" y1="145" x2="418" y2="145" stroke="#9FB8CE" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow)" />
+  <text font-weight="300" x="350" y="135" text-anchor="middle" font-size="11" fill="#9FB8CE">you call out</text>
+
+  <!-- queue: finished work falls and waits -->
+  <line x1="530" y1="220" x2="530" y2="268" stroke="#9FB8CE" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow)" />
+  <text font-weight="300" x="546" y="248" font-size="11" fill="#9FB8CE">drops in</text>
+
+  <rect x="180" y="270" width="380" height="60" rx="10" fill="none" stroke="#9FB8CE" stroke-width="1" />
+  <text font-weight="300" x="370" y="300" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#9FB8CE">callback queue</text>
+</svg>
