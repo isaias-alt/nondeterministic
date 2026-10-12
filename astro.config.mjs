@@ -17,6 +17,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://blog.lucasco.dev',
+  build: { inlineStylesheets: 'always' },
   adapter: vercel(),
 
   // English is the default locale and stays unprefixed. Spanish lives under
