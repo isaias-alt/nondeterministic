@@ -1,0 +1,52 @@
+name: Publish posts
+
+# Flips `draft: true` to `draft: false` on main for every post whose pubDate
+# is today or earlier (America/Asuncion). Runs when main is pushed, and daily
+# at 10:00 America/Asuncion (UTC-3) = 13:00 UTC for posts merged with a future
+# pubDate. Scheduled workflows only run from the default branch (develop), so
+# this file must exist there too, but it only ever edits main.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-posts
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Flip due drafts to published
+        run: |
+          today=$(TZ=America/Asuncion date +%F)
+          published=()
+          while IFS= read -r file; do
+            grep -q '^draft: true' "$file" || continue
+            pub=$(sed -n 's/^pubDate: *"\{0,1\}\([0-9-]\{10\}\).*/\1/p' "$file" | head -1)
+            [ -n "$pub" ] || { echo "No pubDate in $file, skipping"; continue; }
+            if [[ ! "$pub" > "$today" ]]; then
+              sed -i 's/^draft: true/draft: false/' "$file"
+              published+=("$file")
+            fi
+          done < <(find src/content/posts -name 'index.md')
+
+          if [ ${#published[@]} -eq 0 ]; then
+            echo "Nothing to publish (today: $today)."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "publish: ${published[*]}"
+          git push origin main
