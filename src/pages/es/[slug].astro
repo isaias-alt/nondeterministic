@@ -1,0 +1,16 @@
+---
+import PostPage from "../../templates/PostPage.astro";
+import { getPostSlugs, getPostView } from "../../lib/content";
+import { homeUrl, postOgPath } from "../../lib/urls";
+
+export async function getStaticPaths() {
+  // Only translations whose English post is published (see lib/content.ts).
+  const slugs = await getPostSlugs("es");
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const post = await getPostView("es", slug);
+---
+
+<PostPage post={post} homeHref={homeUrl("es")} ogImage={postOgPath("es", slug)} />

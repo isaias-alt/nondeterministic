@@ -1,0 +1,7 @@
+---
+import HomePage from "../../templates/HomePage.astro";
+import { getPostListItems } from "../../lib/content";
+import { homeOgPath } from "../../lib/urls";
+---
+
+<HomePage posts={await getPostListItems("es")} ogImage={homeOgPath("es")} />

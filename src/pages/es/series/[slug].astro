@@ -1,0 +1,15 @@
+---
+import SeriesPage from "../../../templates/SeriesPage.astro";
+import { getSeriesIds, getSeriesView } from "../../../lib/content";
+
+export async function getStaticPaths() {
+  // Needs a seriesEs entry and at least one published translated post.
+  const ids = await getSeriesIds("es");
+  return ids.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const series = await getSeriesView("es", slug);
+---
+
+<SeriesPage series={series} />

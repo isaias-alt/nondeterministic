@@ -1,0 +1,8 @@
+---
+import SeriesIndexPage from "../../../templates/SeriesIndexPage.astro";
+import { getSeriesCards } from "../../../lib/content";
+
+const cards = await getSeriesCards("es");
+---
+
+<SeriesIndexPage series={cards} />
