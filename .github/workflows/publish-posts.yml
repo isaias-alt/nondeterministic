@@ -5,6 +5,8 @@ name: Publish posts
 # 09:30 or later in America/Asuncion. Announcements go out at 10:30, so the
 # post has to be live before that.
 #
+# After publishing, main is merged back into develop, so `git pull` locally.
+#
 # Triggers: a push to main (publishes anything already due, never early),
 # a retried schedule between 09:30 and 10:20 America/Asuncion, and a manual run.
 # GitHub cron is best effort and can start late or skip a run, so it fires
@@ -37,6 +39,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
 
       - name: Flip due drafts to published
         run: |
@@ -74,6 +77,13 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -am "publish: ${published[*]}"
             git push origin main
+
+            # Bring the publish commit back to develop so a local pull gets it.
+            # A conflict fails the job (and the email) instead of being forced.
+            git checkout -B develop origin/develop
+            git merge --no-edit main
+            git push origin develop
+            git checkout main
           else
             echo "Nothing to publish (now $today $now Asuncion)."
           fi
