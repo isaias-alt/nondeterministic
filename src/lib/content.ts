@@ -4,6 +4,23 @@ import { homeUrl, postUrl, seriesIndexUrl, seriesUrl } from './urls';
 import type { PostListItem, PostView, SeriesCard, SeriesView } from './views';
 
 type EnglishPost = CollectionEntry<'posts'>;
+type CollectionName = 'posts' | 'series' | 'postsEs' | 'seriesEs';
+
+const collectionCache = new Map<CollectionName, Promise<unknown>>();
+
+/**
+ * Every page and the nav's language switcher read the same collections, so a
+ * build loads each once. The dev server skips the cache to see live edits.
+ */
+function loadCollection<C extends CollectionName>(name: C): Promise<CollectionEntry<C>[]> {
+	if (!import.meta.env.PROD) return getCollection(name);
+	let entries = collectionCache.get(name);
+	if (!entries) {
+		entries = getCollection(name);
+		collectionCache.set(name, entries);
+	}
+	return entries as Promise<CollectionEntry<C>[]>;
+}
 
 /**
  * An English post is public unless it is a draft in a production build. The
@@ -30,7 +47,7 @@ export interface Translation {
  * unpublished draft is simply left out.
  */
 async function getTranslations(): Promise<Translation[]> {
-	const [spanish, english] = await Promise.all([getCollection('postsEs'), getCollection('posts')]);
+	const [spanish, english] = await Promise.all([loadCollection('postsEs'), loadCollection('posts')]);
 	const englishByDir = new Map(english.map((post) => [dirname(post.filePath), post]));
 
 	const translations: Translation[] = [];
@@ -51,15 +68,15 @@ export async function getTranslatedPost(slug: string): Promise<Translation | und
 }
 
 async function getPublishedPosts(): Promise<EnglishPost[]> {
-	return getCollection('posts', isPublished);
+	return (await loadCollection('posts')).filter(isPublished);
 }
 
 async function getSeriesTitles(lang: Locale): Promise<Map<string, string>> {
 	if (lang === 'en') {
-		const all = await getCollection('series');
+		const all = await loadCollection('series');
 		return new Map(all.map((series) => [series.id, series.data.title]));
 	}
-	const all = await getCollection('seriesEs');
+	const all = await loadCollection('seriesEs');
 	return new Map(all.map((series) => [series.id, series.data.title]));
 }
 
@@ -133,14 +150,14 @@ interface SeriesRecord {
  * a seriesEs entry (with its English counterpart). Posts are in `order`.
  */
 async function getSeriesRecords(lang: Locale): Promise<SeriesRecord[]> {
-	const [english, records] = await Promise.all([getCollection('series'), getPostRecords(lang)]);
+	const [english, records] = await Promise.all([loadCollection('series'), getPostRecords(lang)]);
 	const englishById = new Map(english.map((series) => [series.id, series]));
 
 	let titles: Map<string, { title: string; description: string }>;
 	if (lang === 'en') {
 		titles = new Map(english.map((s) => [s.id, { title: s.data.title, description: s.data.description }]));
 	} else {
-		const spanish = await getCollection('seriesEs');
+		const spanish = await loadCollection('seriesEs');
 		for (const s of spanish) {
 			if (!englishById.has(s.id)) {
 				throw new Error(`${s.filePath} has no English source: expected src/content/series/${s.id}.md.`);
