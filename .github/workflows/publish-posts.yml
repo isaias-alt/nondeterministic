@@ -6,6 +6,9 @@ name: Publish posts
 # post has to be live before that.
 #
 # After publishing, main is merged back into develop, so `git pull` locally.
+# Then the Vercel deploy hook is called (secret VERCEL_DEPLOY_HOOK) so the
+# deploy does not depend on the Git integration reacting, and the job waits for
+# the post to answer 200 on the live site, failing (and emailing) if it never does.
 #
 # Triggers: a push to main (publishes anything already due, never early),
 # a retried schedule between 09:30 and 10:20 America/Asuncion, and a manual run.
@@ -42,6 +45,7 @@ jobs:
           fetch-depth: 0
 
       - name: Flip due drafts to published
+        id: publish
         run: |
           today=$(TZ=America/Asuncion date +%F)
           now=$(TZ=America/Asuncion date +%H%M)
@@ -84,6 +88,7 @@ jobs:
             git merge --no-edit main
             git push origin develop
             git checkout main
+            echo "files=${published[*]}" >> "$GITHUB_OUTPUT"
           else
             echo "Nothing to publish (now $today $now Asuncion)."
           fi
@@ -100,3 +105,43 @@ jobs:
             fi
           done < <(posts)
           exit $missed
+
+      - name: Deploy and verify the post is live
+        if: ${{ !cancelled() && steps.publish.outputs.files != '' }}
+        env:
+          DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+          FILES: ${{ steps.publish.outputs.files }}
+        run: |
+          if [ -n "$DEPLOY_HOOK" ]; then
+            curl -fsS -X POST "$DEPLOY_HOOK" > /dev/null \
+              && echo "Deploy hook called." \
+              || echo "::error::The Vercel deploy hook call failed"
+          else
+            echo "::warning::VERCEL_DEPLOY_HOOK is not set, relying on the Git integration to deploy"
+          fi
+
+          site=https://blog.lucasco.dev
+          failed=0
+          for file in $FILES; do
+            dir=$(dirname "$file")
+            slug=$(basename "$dir")
+            urls=("$site/$slug/")
+            if [ -f "$dir/index.es.md" ] || [ -f "$dir/index.es.mdx" ]; then
+              urls+=("$site/es/$slug/")
+            fi
+            for url in "${urls[@]}"; do
+              live=0
+              for _ in $(seq 1 60); do
+                code=$(curl -s -o /dev/null -w '%{http_code}' "$url?check=$RANDOM")
+                if [ "$code" = 200 ]; then live=1; break; fi
+                sleep 10
+              done
+              if [ "$live" = 1 ]; then
+                echo "Live: $url"
+              else
+                echo "::error::Not live after 10 minutes: $url (last status $code)"
+                failed=1
+              fi
+            done
+          done
+          exit $failed
