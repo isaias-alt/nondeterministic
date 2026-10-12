@@ -1,5 +1,5 @@
 ---
-title: "Why you should stop using git checkout"
+title: "Why you should stop using git checkout?"
 description: "It's time to embrace clearer and more specific Git commands"
 pubDate: "2025-02-11"
 # updatedDate: (optional, not set - post hasn't been revised since publishing)
@@ -41,7 +41,7 @@ This idea isn't just a historical relic, it's why we still use many Unix tools d
 
 ## Simplifying our tools
 
-Git evolved to embrace this clarity. It's like organizing your kitchen and separating utensils by function, suddenly, everything makes more sense. This is how `git switch` and `git reset` were born.
+Git evolved to embrace this clarity. It's like organizing your kitchen and separating utensils by function, suddenly, everything makes more sense. This is how `git switch` and `git restore` were born.
 
 ### `git switch`: The branch specialist
 
@@ -99,7 +99,7 @@ git checkout HEAD file.txt
 git switch main
 git switch -c new-branch
 git restore file.txt
-git restore --source=HEAD file.txt
+git restore --source=HEAD --staged --worktree file.txt
 ```
 
 ## Building better habits

@@ -1,6 +1,6 @@
 ---
 title: "A blog these days?"
-description: "Why blogging still matters"
+description: "Why blogging still matters?"
 pubDate: "2024-07-13"
 # updatedDate: (optional, not set - post hasn't been revised since publishing)
 draft: false

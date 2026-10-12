@@ -1,6 +1,6 @@
 ---
 title: "Your Code Doesn't Run in the Order You Wrote It"
-description: "Why JavaScript feels concurrent despite being single-threaded"
+description: "Why JavaScript feels concurrent despite being single-threaded?"
 pubDate: "2025-10-07"
 updatedDate: "2026-08-27"
 draft: false
