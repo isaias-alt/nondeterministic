@@ -21,6 +21,10 @@ Consult these guides before working on related tasks:
 - [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
 - [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
 
+## Owner-written content
+
+Never modify anything the owner wrote: post bodies, titles, descriptions, dates (`pubDate`, `updatedDate`) and translations (`index.md`, `index.es.md`, series files). Review it and report problems (typos, missing `¿`, inconsistencies), but leave the fix to the owner unless they explicitly ask you to change it.
+
 <!-- BEGIN VEXILLUM v:1 hash:df340839 -->
 ## Vexillum commander
 

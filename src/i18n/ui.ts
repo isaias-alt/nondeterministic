@@ -54,10 +54,10 @@ const en = {
 export type UiKey = keyof typeof en;
 
 const es: Record<UiKey, string> = {
-  "nav.posts": "artículos",
+  "nav.posts": "posts",
   "footer.label": "Pie de página",
   "home.description":
-    "Notas sobre cómo construir software. Frontend, backend y las decisiones intermedias. Sin garantías sobre el orden de salida.",
+    "Notas sobre cómo construir software. Frontend, backend y las decisiones del medio. Sin garantías sobre el orden de salida.",
   "series.singular": "Serie",
   "series.plural": "Series",
   "series.description":
