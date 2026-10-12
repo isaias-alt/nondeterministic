@@ -42,4 +42,31 @@ const series = defineCollection({
     })
 });
 
-export const collections = { posts, series };
+/**
+ * Spanish translations. They carry only text (title, description, body);
+ * dates, cover, series and order are read from the English entry, so metadata
+ * cannot drift. `.strict()` makes a stray `draft`, `pubDate` or `cover` in a
+ * Spanish file a build error instead of a value that is silently ignored.
+ * See src/lib/content.ts for how entries pair with their English source.
+ */
+const postsEs = defineCollection({
+  loader: glob({
+    pattern: '**/index.es.{md,mdx}',
+    base: './src/content/posts',
+    generateId: slugFromParentFolder
+  }),
+  schema: z.strictObject({
+    title: z.string(),
+    description: z.string()
+  })
+});
+
+const seriesEs = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/series-es' }),
+  schema: z.strictObject({
+    title: z.string(),
+    description: z.string()
+  })
+});
+
+export const collections = { posts, series, postsEs, seriesEs };

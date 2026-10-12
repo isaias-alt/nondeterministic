@@ -18,6 +18,14 @@ export default defineConfig({
   site: 'https://blog.lucasco.dev',
   adapter: vercel(),
 
+  // English is the default locale and stays unprefixed. Spanish lives under
+  // /es/. No `fallback`: untranslated posts get no Spanish page at all.
+  i18n: {
+    locales: ['en', 'es'],
+    defaultLocale: 'en',
+    routing: { prefixDefaultLocale: false }
+  },
+
   markdown: {
     shikiConfig: {
       theme: concreteTheme,
