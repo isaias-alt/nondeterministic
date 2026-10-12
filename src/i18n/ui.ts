@@ -19,10 +19,14 @@ export const ogLocales: Record<Locale, string> = {
   es: "es_LA",
 };
 
-/** Label and title of the link that switches TO each language, in that language. */
+/**
+ * Label and name of the link that switches TO each language. The label is the
+ * language code: the nav is tight at phone width. The name, in that language,
+ * is the title and accessible name.
+ */
 export const languageSwitch: Record<Locale, { label: string; title: string }> = {
-  en: { label: "english", title: "Read in English" },
-  es: { label: "español", title: "Leer en español" },
+  en: { label: "en", title: "Read in English" },
+  es: { label: "es", title: "Leer en español" },
 };
 
 const en = {
