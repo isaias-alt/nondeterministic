@@ -3,7 +3,7 @@ title: "The Dependency You Never Declared"
 description: "Why the same line of code works in one environment and crashes in other?"
 pubDate: "2026-10-12"
 # updatedDate: "2026-08-27"
-draft: true
+draft: false
 # cover: (optional, no cover image for this post)
 # series: (optional, this post is standalone, not part of a series)
 # order: (optional, only used when `series` is set)
