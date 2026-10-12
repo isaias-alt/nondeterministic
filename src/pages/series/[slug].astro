@@ -1,44 +1,15 @@
 ---
-import { getCollection } from "astro:content";
 import SeriesPage from "../../templates/SeriesPage.astro";
-import type { SeriesView } from "../../lib/views";
+import { getSeriesIds, getSeriesView } from "../../lib/content";
 
 export async function getStaticPaths() {
-  const allSeries = await getCollection("series");
-  const allPosts = await getCollection(
-    "posts",
-    ({ data }) => !import.meta.env.PROD || !data.draft,
-  );
-
-  // A series with no qualifying posts (e.g. all its posts are draft) has
-  // nothing to land on and shouldn't get a page.
-  return allSeries
-    .filter((series) =>
-      allPosts.some((post) => post.data.series?.id === series.id),
-    )
-    .map((series) => ({ params: { slug: series.id }, props: { series } }));
+  // A series with no published posts has nothing to land on and gets no page.
+  const ids = await getSeriesIds("en");
+  return ids.map((slug) => ({ params: { slug } }));
 }
 
-const { series } = Astro.props;
-
-const allPosts = await getCollection(
-  "posts",
-  ({ data }) => !import.meta.env.PROD || !data.draft,
-);
-const posts = allPosts
-  .filter((post) => post.data.series?.id === series.id)
-  .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
-
-const view: SeriesView = {
-  title: series.data.title,
-  description: series.data.description,
-  cover: series.data.cover,
-  posts: posts.map((post) => ({
-    href: `/${post.id}`,
-    title: post.data.title,
-    description: post.data.description,
-  })),
-};
+const { slug } = Astro.params;
+const series = await getSeriesView("en", slug);
 ---
 
-<SeriesPage series={view} />
+<SeriesPage series={series} />

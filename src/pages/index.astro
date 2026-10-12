@@ -1,28 +1,7 @@
 ---
-import { getCollection, getEntry } from "astro:content";
 import HomePage from "../templates/HomePage.astro";
-import type { PostListItem } from "../lib/views";
-
-const allPosts = await getCollection(
-  "posts",
-  ({ data }) => !import.meta.env.PROD || !data.draft,
-);
-const posts = allPosts.sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
-
-const items: PostListItem[] = [];
-for (const post of posts) {
-  const series = post.data.series ? await getEntry(post.data.series) : undefined;
-  items.push({
-    id: post.id,
-    href: `/${post.id}`,
-    title: post.data.title,
-    description: post.data.description,
-    pubDate: post.data.pubDate,
-    seriesTitle: series?.data.title,
-  });
-}
+import { getPostListItems } from "../lib/content";
+import { homeOgPath } from "../lib/urls";
 ---
 
-<HomePage posts={items} ogImage="/og/home.png" />
+<HomePage posts={await getPostListItems("en")} ogImage={homeOgPath("en")} />

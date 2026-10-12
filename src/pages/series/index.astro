@@ -1,25 +1,9 @@
 ---
-import { getCollection } from "astro:content";
 import SeriesIndexPage from "../../templates/SeriesIndexPage.astro";
-import type { SeriesCard } from "../../lib/views";
+import { getSeriesCards } from "../../lib/content";
 
-const allSeries = await getCollection("series");
-const allPosts = await getCollection(
-  "posts",
-  ({ data }) => !import.meta.env.PROD || !data.draft,
-);
-
-// A series with no qualifying posts (e.g. all its posts are draft) has
-// nothing to show and shouldn't be listed.
-const cards: SeriesCard[] = allSeries
-  .map((series) => ({
-    href: `/series/${series.id}`,
-    title: series.data.title,
-    description: series.data.description,
-    cover: series.data.cover,
-    count: allPosts.filter((post) => post.data.series?.id === series.id).length,
-  }))
-  .filter(({ count }) => count > 0);
+// A series with no published posts has nothing to show and isn't listed.
+const cards = await getSeriesCards("en");
 ---
 
 <SeriesIndexPage series={cards} />
