@@ -131,7 +131,8 @@ const jsonLd = {
 
     navigator.clipboard.writeText(code.textContent).catch(() => {});
     const original = button.textContent;
-    button.textContent = "copied";
+    // Spanish posts carry their label in data-code-copied (rehype plugin).
+    button.textContent = button.dataset.codeCopied ?? "copied";
     setTimeout(() => {
       button.textContent = original;
     }, 1500);

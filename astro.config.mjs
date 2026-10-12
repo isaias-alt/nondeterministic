@@ -8,6 +8,7 @@ import { unified } from '@astrojs/markdown-remark';
 import concreteTheme from './src/styles/shiki-concrete-theme.ts';
 import { codeChromeTransformer } from './src/styles/shiki-code-chrome.ts';
 import { rehypeProseClasses } from './src/styles/rehype-prose-classes.ts';
+import { rehypeLocalizeCodeChrome } from './src/styles/rehype-localize-code-chrome.ts';
 
 import tailwindcss from '@tailwindcss/vite';
 
@@ -34,6 +35,7 @@ export default defineConfig({
     processor: unified({
       rehypePlugins: [
         rehypeProseClasses,
+        rehypeLocalizeCodeChrome,
         [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }]
       ]
     })

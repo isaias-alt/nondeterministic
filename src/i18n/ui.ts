@@ -42,6 +42,7 @@ const en = {
   "post.readingTime": "{n} min read",
   "post.updated": "Updated",
   "post.edit": "Edit on GitHub",
+  "post.copy": "copy",
   "post.copied": "copied",
   "og.by": "by",
 } as const;
@@ -65,6 +66,7 @@ const es: Record<UiKey, string> = {
   "post.readingTime": "{n} min de lectura",
   "post.updated": "Actualizado el",
   "post.edit": "Editar en GitHub",
+  "post.copy": "copiar",
   "post.copied": "copiado",
   "og.by": "por",
 };
