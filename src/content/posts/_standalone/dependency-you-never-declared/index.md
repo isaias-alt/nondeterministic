@@ -1,7 +1,7 @@
 ---
-title: "TODO"
+title: "The Dependency You Never Declared"
 description: "Why the same line of code works in one environment and crashes in other"
-pubDate: "2026-10-09"
+pubDate: "2026-10-12"
 # updatedDate: "2026-08-27"
 draft: true
 # cover: (optional, no cover image for this post)
