@@ -1,5 +1,10 @@
 ---
+import { getLang, t } from "../i18n/ui";
+import { homeUrl } from "../lib/urls";
 
+const lang = getLang(Astro.currentLocale);
+const linkClass =
+  "font-mono text-xs text-fog no-underline transition-colors duration-150 hover:text-bone";
 ---
 
 <footer class="mt-20 border-t border-line pt-8 pb-12">
@@ -7,18 +12,15 @@
     class="mx-auto flex max-w-195 flex-wrap items-center justify-between gap-4 px-6"
   >
     <span class="font-mono text-xs text-fog">Lucas Casco · 2026</span>
-    <nav aria-label="Footer" class="flex gap-4.5">
-      <a
-        href="/"
-        class="font-mono text-xs text-fog no-underline transition-colors duration-150 hover:text-bone"
-      >
-        posts
+    <nav aria-label={t(lang, "footer.label")} class="flex gap-4.5">
+      <a href={homeUrl(lang)} class={linkClass}>
+        {t(lang, "nav.posts")}
       </a>
       <a
         href="https://lucasco.dev"
         target="_blank"
         rel="noopener noreferrer"
-        class="font-mono text-xs text-fog no-underline transition-colors duration-150 hover:text-bone"
+        class={linkClass}
       >
         whoami
       </a>

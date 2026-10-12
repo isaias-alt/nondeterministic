@@ -24,7 +24,7 @@ const longUpdatedDate = post.updatedDate
 
 const editUrl = `https://github.com/isaias-alt/nondeterministic/edit/develop/${post.filePath}`;
 
-const postUrl = new URL(Astro.url.pathname, Astro.site).href;
+const postUrl = new URL(Astro.url.pathname.replace(/\/?$/, "/"), Astro.site).href;
 const ogImageUrl = new URL(ogImage, Astro.site).href;
 
 const jsonLd = {
@@ -32,6 +32,7 @@ const jsonLd = {
   "@type": "BlogPosting",
   headline: post.title,
   description: post.description,
+  inLanguage: lang,
   datePublished: post.pubDate.toISOString(),
   dateModified: (post.updatedDate ?? post.pubDate).toISOString(),
   url: postUrl,

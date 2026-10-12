@@ -1,6 +1,13 @@
 ---
-const { pathname } = Astro.url;
-const isPostsActive = pathname === "/";
+import { getLang, t } from "../i18n/ui";
+import { homeUrl } from "../lib/urls";
+
+const lang = getLang(Astro.currentLocale);
+const home = homeUrl(lang);
+
+// The dev server also serves the home without a trailing slash.
+const trimSlash = (path: string) => path.replace(/\/+$/, "");
+const isPostsActive = trimSlash(Astro.url.pathname) === trimSlash(home);
 const linkClass =
   "font-mono text-[13px] text-fog no-underline transition-colors duration-150 hover:text-bone";
 ---
@@ -10,14 +17,14 @@ const linkClass =
 >
   <div class="mx-auto flex max-w-195 items-center justify-between px-6 py-4">
     <a
-      href="/"
+      href={home}
       class="font-mono text-sm font-medium tracking-[-0.01em] text-bone no-underline"
     >
       nondeterministic
     </a>
     <div class="flex gap-5.5">
-      <a href="/" class={`${linkClass} ${isPostsActive ? "text-bone" : ""}`}
-        >posts</a
+      <a href={home} class={`${linkClass} ${isPostsActive ? "text-bone" : ""}`}
+        >{t(lang, "nav.posts")}</a
       >
       <a
         href="https://lucasco.dev"
