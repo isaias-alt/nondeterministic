@@ -1,15 +1,26 @@
 name: Publish posts
 
-# Flips `draft: true` to `draft: false` on main for every post whose pubDate
-# is today or earlier (America/Asuncion). Runs when main is pushed, and daily
-# at 10:00 America/Asuncion (UTC-3) = 13:00 UTC for posts merged with a future
-# pubDate. Scheduled workflows only run from the default branch (develop), so
-# this file must exist there too, but it only ever edits main.
+# Flips `draft: true` to `draft: false` on main for every post that is due.
+# A post is due when its pubDate is in the past, or is today and it is already
+# 09:30 or later in America/Asuncion. Announcements go out at 10:30, so the
+# post has to be live before that.
+#
+# Triggers: a push to main (publishes anything already due, never early),
+# a retried schedule between 09:30 and 10:20 America/Asuncion, and a manual run.
+# GitHub cron is best effort and can start late or skip a run, so it fires
+# every 10 minutes instead of once. The job is idempotent: once a post is
+# published, later runs find nothing to do. If a post is still a due draft at
+# the end, the job fails so GitHub emails the failure.
+#
+# Paraguay is on permanent UTC-3, so 09:30 Asuncion = 12:30 UTC.
+# Scheduled workflows only run from the default branch (develop), so this file
+# must exist there too, but it only ever edits main.
 on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 13 * * *"
+    - cron: "30,40,50 12 * * *"
+    - cron: "0,10,20 13 * * *"
   workflow_dispatch:
 
 permissions:
@@ -30,23 +41,52 @@ jobs:
       - name: Flip due drafts to published
         run: |
           today=$(TZ=America/Asuncion date +%F)
+          now=$(TZ=America/Asuncion date +%H%M)
+
+          # pubDate, today, HHMM -> due when the date passed, or it is today and 09:30+.
+          is_due() {
+            [[ "$1" < "$2" ]] || { [[ "$1" == "$2" ]] && (( 10#$3 >= 930 )); }
+          }
+
+          pub_date() {
+            sed -n 's/^pubDate: *"\{0,1\}\([0-9-]\{10\}\).*/\1/p' "$1" | head -1
+          }
+
+          posts() {
+            find src/content/posts \( -name 'index.md' -o -name 'index.mdx' \)
+          }
+
           published=()
           while IFS= read -r file; do
             grep -q '^draft: true' "$file" || continue
-            pub=$(sed -n 's/^pubDate: *"\{0,1\}\([0-9-]\{10\}\).*/\1/p' "$file" | head -1)
+            pub=$(pub_date "$file")
             [ -n "$pub" ] || { echo "No pubDate in $file, skipping"; continue; }
-            if [[ ! "$pub" > "$today" ]]; then
+            if is_due "$pub" "$today" "$now"; then
               sed -i 's/^draft: true/draft: false/' "$file"
               published+=("$file")
+            else
+              echo "Not due yet: $file ($pub, now $today $now Asuncion)"
             fi
-          done < <(find src/content/posts -name 'index.md')
+          done < <(posts)
 
-          if [ ${#published[@]} -eq 0 ]; then
-            echo "Nothing to publish (today: $today)."
-            exit 0
+          if [ ${#published[@]} -gt 0 ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -am "publish: ${published[*]}"
+            git push origin main
+          else
+            echo "Nothing to publish (now $today $now Asuncion)."
           fi
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "publish: ${published[*]}"
-          git push origin main
+          # Fail loudly if a due post is still a draft.
+          missed=0
+          while IFS= read -r file; do
+            grep -q '^draft: true' "$file" || continue
+            pub=$(pub_date "$file")
+            [ -n "$pub" ] || continue
+            if is_due "$pub" "$today" "$now"; then
+              echo "::error file=$file::Due post is still a draft ($pub)"
+              missed=1
+            fi
+          done < <(posts)
+          exit $missed
