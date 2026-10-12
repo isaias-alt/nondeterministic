@@ -5,6 +5,7 @@ import Footer from "../components/Footer.astro";
 import GoogleAnalytics from "../components/GoogleAnalytics.astro";
 import JsonLd from "../components/JsonLd.astro";
 import { getLang, ogLocales } from "../i18n/ui";
+import { getAlternateUrl } from "../lib/content";
 
 interface Props {
   title?: string;
@@ -23,6 +24,7 @@ const {
 } = Astro.props;
 
 const lang = getLang(Astro.currentLocale);
+const alternate = await getAlternateUrl(Astro.url.pathname);
 const ogImageUrl = ogImage ? new URL(ogImage, Astro.site) : undefined;
 // The dev server also serves pages without a trailing slash; canonical never does.
 const canonicalUrl = new URL(Astro.url.pathname.replace(/\/?$/, "/"), Astro.site);
@@ -57,10 +59,10 @@ const canonicalUrl = new URL(Astro.url.pathname.replace(/\/?$/, "/"), Astro.site
     <GoogleAnalytics />
   </head>
   <body class="bg-bg text-base leading-[1.6] text-bone antialiased font-inter">
-    <Nav />
+    <Nav alternate={alternate} />
     <main class="animate-fade-in">
       <slot />
     </main>
-    <Footer />
+    <Footer alternate={alternate} />
   </body>
 </html>

@@ -1,7 +1,13 @@
 ---
-import { getLang, t } from "../i18n/ui";
+import LanguageSwitch from "./LanguageSwitch.astro";
+import { getLang, t, type Locale } from "../i18n/ui";
 import { homeUrl } from "../lib/urls";
 
+interface Props {
+  alternate: { lang: Locale; href: string };
+}
+
+const { alternate } = Astro.props;
 const lang = getLang(Astro.currentLocale);
 const linkClass =
   "font-mono text-xs text-fog no-underline transition-colors duration-150 hover:text-bone";
@@ -24,6 +30,7 @@ const linkClass =
       >
         whoami
       </a>
+      <LanguageSwitch alternate={alternate} class={linkClass} />
     </nav>
   </div>
 </footer>
