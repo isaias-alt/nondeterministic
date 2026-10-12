@@ -1,0 +1,138 @@
+---
+import { Image } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+import ArrowLeftIcon from "../components/ArrowLeftIcon.astro";
+import { formatDate, getLang, t } from "../i18n/ui";
+import { estimateReadingMinutes } from "../lib/reading-time";
+import type { PostView } from "../lib/views";
+
+interface Props {
+  post: PostView;
+  homeHref: string;
+  ogImage: string;
+}
+
+const { post, homeHref, ogImage } = Astro.props;
+const { Content } = post;
+const lang = getLang(Astro.currentLocale);
+
+const readingMinutes = estimateReadingMinutes(post.body);
+const longDate = formatDate(lang, post.pubDate, "long");
+const longUpdatedDate = post.updatedDate
+  ? formatDate(lang, post.updatedDate, "long")
+  : undefined;
+
+const editUrl = `https://github.com/isaias-alt/nondeterministic/edit/develop/${post.filePath}`;
+
+const postUrl = new URL(Astro.url.pathname, Astro.site).href;
+const ogImageUrl = new URL(ogImage, Astro.site).href;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.title,
+  description: post.description,
+  datePublished: post.pubDate.toISOString(),
+  dateModified: (post.updatedDate ?? post.pubDate).toISOString(),
+  url: postUrl,
+  image: ogImageUrl,
+  mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
+  author: {
+    "@type": "Person",
+    name: "Lucas Casco",
+    url: "https://lucasco.dev",
+  },
+  publisher: { "@type": "Person", name: "Lucas Casco" },
+};
+---
+
+<Layout
+  title={`${post.title} - nondeterministic`}
+  description={post.description}
+  ogImage={ogImage}
+  type="article"
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto max-w-195 px-6">
+    <div class="pt-[clamp(48px,8vh,80px)]">
+      <div class="mb-7 font-mono text-xs text-fog">
+        <a
+          href={homeHref}
+          class="inline-flex items-center gap-1 border-b border-steel-dim pb-px text-steel-text no-underline"
+        >
+          <ArrowLeftIcon class="h-3 w-3" />
+          {t(lang, "nav.posts")}
+        </a>
+      </div>
+      <h1
+        class="font-archivo text-[clamp(30px,5vw,44px)] leading-[1.06] font-extrabold tracking-[-0.035em] text-bone"
+      >
+        {post.title}
+      </h1>
+      <div
+        class="mt-5 flex flex-wrap gap-4 border-b border-line pb-7 font-mono text-xs text-fog"
+      >
+        <span>{longDate}</span><span class="text-steel-dim-text">/</span>
+        <span>{t(lang, "post.readingTime", { n: readingMinutes })}</span>
+        {
+          longUpdatedDate && (
+            <>
+              <span class="text-steel-dim-text">/</span>
+              <span>
+                {t(lang, "post.updated")} {longUpdatedDate}
+              </span>
+            </>
+          )
+        }
+      </div>
+    </div>
+
+    {
+      post.cover && (
+        <div class="my-8 aspect-video overflow-hidden rounded-[3px] border border-line">
+          <Image
+            src={post.cover}
+            alt={post.title}
+            class="h-full w-full object-cover"
+          />
+        </div>
+      )
+    }
+
+    <div class="max-w-[68ch] pt-3">
+      <Content />
+    </div>
+
+    <div class="mt-2 border-t border-line pt-6">
+      <a
+        href={editUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="border-b border-steel-dim pb-px font-mono text-[13px] text-steel-text no-underline hover:border-steel"
+      >
+        {t(lang, "post.edit")}
+      </a>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    const button = target.closest<HTMLButtonElement>("[data-code-copy]");
+    if (!button) return;
+
+    const block = button.closest("[data-code-block]");
+    const code = block?.querySelector("pre code");
+    if (!code?.textContent) return;
+
+    navigator.clipboard.writeText(code.textContent).catch(() => {});
+    const original = button.textContent;
+    button.textContent = "copied";
+    setTimeout(() => {
+      button.textContent = original;
+    }, 1500);
+  });
+</script>

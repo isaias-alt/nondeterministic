@@ -1,0 +1,71 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import { getLang, t } from "../i18n/ui";
+import type { SeriesView } from "../lib/views";
+
+interface Props {
+  series: SeriesView;
+}
+
+const { series } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const { posts } = series;
+---
+
+<Layout
+  title={`${series.title} - nondeterministic`}
+  description={series.description}
+>
+  <div class="mx-auto max-w-195 px-6">
+    <div class="pt-[clamp(48px,8vh,80px)]">
+      <div
+        class="mb-4 font-mono text-xs tracking-[0.06em] text-steel-text uppercase"
+      >
+        {t(lang, "series.singular")} · {posts.length}
+        {posts.length === 1 ? t(lang, "series.part") : t(lang, "series.parts")}
+      </div>
+      <h1
+        class="font-archivo text-[clamp(32px,5.5vw,48px)] leading-[1.04] font-extrabold tracking-[-0.035em] text-bone"
+      >
+        {series.title}
+      </h1>
+      <p class="mt-4 max-w-[56ch] text-base text-fog">
+        {series.description}
+      </p>
+    </div>
+
+    <div
+      class="mt-8 mb-2 aspect-21/9 overflow-hidden rounded-[3px] border border-line"
+    >
+      <Image
+        src={series.cover}
+        alt={series.title}
+        class="h-full w-full object-cover"
+      />
+    </div>
+
+    <div class="py-6">
+      {
+        posts.map((post, index) => (
+          <a
+            href={post.href}
+            class="group flex items-baseline gap-4.5 border-b border-line py-4 no-underline text-inherit transition-[padding-left] duration-200 hover:pl-2"
+          >
+            <span class="min-w-7 font-mono text-[13px] text-steel-text">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <div>
+              <div class="font-archivo text-lg font-semibold tracking-[-0.02em] text-bone transition-colors duration-150 group-hover:text-steel-text">
+                {post.title}
+              </div>
+              <div class="mt-0.75 text-[13.5px] text-fog">
+                {post.description}
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</Layout>

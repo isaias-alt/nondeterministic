@@ -1,0 +1,68 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import { getLang, t } from "../i18n/ui";
+import type { SeriesCard } from "../lib/views";
+
+interface Props {
+  series: SeriesCard[];
+}
+
+const { series: cards } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+---
+
+<Layout
+  title={`${t(lang, "series.plural")} - nondeterministic`}
+  description={t(lang, "series.description")}
+>
+  <div class="mx-auto max-w-195 px-6">
+    <div class="pt-[clamp(56px,10vh,96px)] pb-4">
+      <h1
+        class="font-archivo text-[clamp(34px,6vw,52px)] leading-[1.02] font-extrabold tracking-[-0.035em] text-bone"
+      >
+        {t(lang, "series.plural")}<span class="text-steel">.</span>
+      </h1>
+      <p class="mt-4 max-w-[52ch] text-[15px] text-fog">
+        {t(lang, "series.tagline")}
+      </p>
+    </div>
+
+    {
+      cards.length === 0 ? (
+        <p class="py-6 pb-12 font-mono text-[13px] text-fog">
+          {t(lang, "series.empty")}
+        </p>
+      ) : (
+        <div class="grid gap-5 pt-9 pb-6">
+          {cards.map((card) => (
+            <a
+              href={card.href}
+              class="flex gap-5 rounded border border-line bg-surface p-4.5 no-underline text-inherit transition-colors duration-200 hover:border-steel-dim max-[640px]:flex-col"
+            >
+              <div class="aspect-square w-30 shrink-0 overflow-hidden rounded-[3px] border border-line max-[640px]:aspect-16/7 max-[640px]:w-full">
+                <Image
+                  src={card.cover}
+                  alt={card.title}
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 class="font-archivo text-xl font-bold tracking-[-0.02em] text-bone">
+                  {card.title}
+                </h3>
+                <div class="mt-1.5 font-mono text-[11px] text-steel-text">
+                  {card.count}{" "}
+                  {card.count === 1 ? t(lang, "series.part") : t(lang, "series.parts")}
+                </div>
+                <p class="mt-2 text-sm leading-normal text-fog">
+                  {card.description}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</Layout>
