@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { ImageResponse } from '@vercel/og';
 import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { createElement } from 'react';
 import sharp from 'sharp';
 
@@ -10,21 +11,20 @@ const HOME_TITLE = 'nondeterministic';
 const HOME_TAGLINE =
 	'Notes on building software. Frontend, backend, and the decisions in between. No guarantees on output order.';
 
+// Resolved from the project root: import.meta.url points into the bundled
+// output (.vercel/output), where node_modules and public/ do not exist.
 const archivoBold = readFile(
-	new URL('../../../node_modules/@fontsource/archivo/files/archivo-latin-800-normal.woff', import.meta.url)
+	join(process.cwd(), 'node_modules/@fontsource/archivo/files/archivo-latin-800-normal.woff')
 );
 const jetbrainsMono = readFile(
-	new URL(
-		'../../../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff',
-		import.meta.url
-	)
+	join(process.cwd(), 'node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff')
 );
 const interRegular = readFile(
-	new URL('../../../node_modules/@fontsource/inter/files/inter-latin-400-normal.woff', import.meta.url)
+	join(process.cwd(), 'node_modules/@fontsource/inter/files/inter-latin-400-normal.woff')
 );
 // Satori/resvg render images most reliably as PNG, so the source .webp avatar
 // is transcoded once at module load instead of embedded as-is.
-const avatarDataUri = readFile(new URL('../../../public/me.webp', import.meta.url))
+const avatarDataUri = readFile(join(process.cwd(), 'public/me.webp'))
 	.then((buf) => sharp(buf).resize(112, 112, { fit: 'cover' }).png().toBuffer())
 	.then((png) => `data:image/png;base64,${png.toString('base64')}`);
 

@@ -2,6 +2,7 @@ import type { APIRoute, GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import { ImageResponse } from '@vercel/og';
 import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { createElement } from 'react';
 import sharp from 'sharp';
 
@@ -10,18 +11,17 @@ export const getStaticPaths: GetStaticPaths = async () => {
 	return posts.map((post) => ({ params: { slug: post.id }, props: { title: post.data.title } }));
 };
 
+// Resolved from the project root: import.meta.url points into the bundled
+// output (.vercel/output), where node_modules and public/ do not exist.
 const archivoBold = readFile(
-	new URL('../../../node_modules/@fontsource/archivo/files/archivo-latin-800-normal.woff', import.meta.url)
+	join(process.cwd(), 'node_modules/@fontsource/archivo/files/archivo-latin-800-normal.woff')
 );
 const jetbrainsMono = readFile(
-	new URL(
-		'../../../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff',
-		import.meta.url
-	)
+	join(process.cwd(), 'node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff')
 );
 // Satori/resvg render images most reliably as PNG, so the source .webp avatar
 // is transcoded once at module load instead of embedded as-is.
-const avatarDataUri = readFile(new URL('../../../public/me.webp', import.meta.url))
+const avatarDataUri = readFile(join(process.cwd(), 'public/me.webp'))
 	.then((buf) => sharp(buf).resize(112, 112, { fit: 'cover' }).png().toBuffer())
 	.then((png) => `data:image/png;base64,${png.toString('base64')}`);
 
