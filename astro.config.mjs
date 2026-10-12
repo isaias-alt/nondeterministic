@@ -43,5 +43,21 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
 
-  integrations: [sitemap()]
+  integrations: [
+    sitemap({
+      // The only source of hreflang: pages with a counterpart get reciprocal
+      // alternates, pages without one get none. The HTML has no alternates.
+      i18n: { defaultLocale: 'en', locales: { en: 'en', es: 'es' } },
+      serialize(item) {
+        // The integration does not emit x-default. It points at the English
+        // page. `serialize` can run more than once per item, so guard it.
+        const links = item.links ?? [];
+        const english = links.find((link) => link.lang === 'en');
+        if (english && !links.some((link) => link.lang === 'x-default')) {
+          links.push({ url: english.url, lang: 'x-default' });
+        }
+        return item;
+      }
+    })
+  ]
 });
