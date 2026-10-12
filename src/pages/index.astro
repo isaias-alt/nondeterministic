@@ -15,6 +15,7 @@ const items: PostListItem[] = [];
 for (const post of posts) {
   const series = post.data.series ? await getEntry(post.data.series) : undefined;
   items.push({
+    id: post.id,
     href: `/${post.id}`,
     title: post.data.title,
     description: post.data.description,

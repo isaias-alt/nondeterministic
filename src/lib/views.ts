@@ -8,6 +8,8 @@ import type { render } from 'astro:content';
  */
 
 export interface PostListItem {
+	/** Slug, shared by both languages. */
+	id: string;
 	href: string;
 	title: string;
 	description: string;
