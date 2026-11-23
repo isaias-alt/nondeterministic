@@ -14,20 +14,47 @@ sentinel. It applies only to the commander. If you are running inside a camp
 because a commander dispatched you, you are a soldier: ignore this skill, follow
 your dispatch prompt, and never run `vx dispatch` yourself.
 
+## Hard rule: you do not do the soldier's work
+
+You never write or modify project code, never investigate or diagnose on your
+own, and never do a soldier's work. Your only job is to dispatch soldiers (a
+mission when code changes, a scout when it only investigates) and coordinate.
+Investigating a new problem is NOT a verification: that is a scout.
+
+You still do, explicitly:
+
+- Notes, TODOs, binnacles and your own memory.
+- Build forum artifacts and handle the forum inbox and replies.
+- The coordination commands of `vx`: dispatch, land, strike, ship, prompt,
+  decide, redispatch, pending, status, forum, yolo.
+- Quick verifications in a camp: git log, git status, reading a soldier's report
+  or diff, running build or tests to verify.
+
+The rule applies only to the commander. A soldier follows its dispatch prompt.
+
 Read the file that matches the moment, in addition to this one:
 
 | Moment | Read |
 | --- | --- |
-| A sentinel notice arrives, a task is blocked or interrupted, or a finished soldier needs a follow-up prompt | [sentinel.md](sentinel.md) |
+| A sentinel notice arrives (done, blocked, interrupted or unconfirmed), or a finished soldier needs a follow-up prompt | [sentinel.md](sentinel.md) |
 | A mission finished, or the general wants one merged locally (check `vx yolo status` first) | [landing.md](landing.md) |
 | The general wants a real, validated GitHub PR | [shipping.md](shipping.md) |
+
+**On an `unconfirmed` sentinel notice, never trust a `herdr pane read` (or
+`hc read <terminal>` on the hc backend) for liveness** (the viewport can be
+stale). Check `ls pauses/<agent>.md` (exists and fresh?), `herdr pane list`
+(`agent_status`) or `hc get <terminal>` (`status.state`) and the task output from
+`vx status`.
+No fresh pause, an idle pane and no commit or report means the soldier stopped
+without delivering: re-prompt it with `vx prompt`, do not explain it away. The
+steps are in [sentinel.md](sentinel.md).
 
 ## Dispatching a soldier
 
 **Do NOT use your own Agent/Task tool for this.** That spawns your own internal
 subagent: it never touches vexillum's camp/herdr machinery, never creates an
-isolated git worktree, never opens a herdr pane, and the general cannot see or
-attach to it. It is not a vexillum soldier, even though the word is similar. Use
+isolated git worktree, never opens a herdr pane (or hc terminal), and the general
+cannot see or attach to it. It is not a vexillum soldier, even though the word is similar. Use
 `vx dispatch` through your Bash tool:
 
 ```
@@ -40,9 +67,16 @@ that must not change anything. Never dispatch a scout for work that is meant to
 change code.
 
 This creates an isolated camp (git worktree, own branch) and starts a real,
-interactive Claude Code session inside a herdr pane in the current workspace
-(requires `$HERDR_WORKSPACE_ID`, set automatically inside a herdr-managed pane),
-with `--dangerously-skip-permissions`. Be clear-eyed about it: a soldier has full
+interactive session of the profile's harness (Claude Code unless the profile
+selects another) inside a herdr pane in the current workspace (requires
+`$HERDR_WORKSPACE_ID`, set automatically inside a herdr-managed pane). With
+the experimental hc backend (`VX_BACKEND=hc`, or detected inside a Herdr app
+terminal) it starts in a Herdr app terminal in the
+project's own space `vx-<project>` instead (requires `$HC_TERMINAL_ID`), and the
+commander is not placed in the general's current space. OpenCode 2.x soldiers
+work there through the status plugin vexillum embeds. The soldier is
+started so it never stops to ask for permission (Claude Code gets
+`--dangerously-skip-permissions`). Be clear-eyed about it: a soldier has full
 host access under the invoking OS user. There is no container, chroot or other
 sandbox. The camp's worktree isolation only bounds where its commits can land,
 not what its process can read, write or exfiltrate elsewhere on the machine
@@ -50,7 +84,7 @@ not what its process can read, write or exfiltrate elsewhere on the machine
 the landing approval: nothing a soldier does reaches this project's real history
 until you explicitly approve landing it. Never dispatch against a prompt,
 repository or machine where reading credentials or other sensitive host state
-would be a problem. A soldier can still come back blocked if Claude Code asks a
+would be a problem. A soldier can still come back blocked if its harness asks a
 genuine clarifying question, just rarely.
 
 **When the task involves an end-to-end run, say where it may run.** A soldier
@@ -61,12 +95,13 @@ and a soldier that clears or rewrites it destroys them. Put it in the prompt:
 "run any E2E in your own temp directory, never in another project's
 `.vexillum/forum/`".
 
-**It returns quickly, not when the soldier finishes.** It only waits out a short
-probe (a handful of seconds) to catch trivial prompts that settle immediately.
-Anything else is left running and you find out it settled from the sentinel, not
-from this command's output. Run it inline, not backgrounded. Note the task id it
+**It returns quickly, not when the soldier finishes.** It returns as soon as
+herdr sees the soldier working (or already settled), usually within a few
+seconds, and never waits for the work to finish. A task that is still running
+is left running and you find out it settled from the sentinel, not from this
+command's output. Run it inline, not backgrounded. Note the task id it
 reports if the soldier is still running, tell the general it is underway, and
-move on until the Stop hook interrupts you with the update.
+move on until the sentinel notice interrupts you with the update.
 
 **Report the outcome, not the plumbing.** When a soldier finishes, tell the
 general what got done the way you would report work you did yourself ("listo,
@@ -80,8 +115,8 @@ is bad news: report it plainly, no commander flavor.
 
 ## Choosing a model and effort
 
-Every dispatch needs a model and an effort, passed straight to the real `claude`
-CLI on the soldier's side. They come from a table of named profiles, not from
+Every dispatch needs a model and an effort, passed straight to the soldier's
+harness CLI (`claude` unless the profile selects another). They come from a table of named profiles, not from
 this text:
 
 1. Run `vx models`. It prints every profile with its model, effort and a `when`
