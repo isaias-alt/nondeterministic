@@ -49,9 +49,9 @@ Eso ya es mucho. Pero el tráfico no se reparte parejo. Un lanzamiento es front-
 69.44 TB/s × 8 ≈ 555 Tbps
 ```
 
-Y si el lanzamiento es un récord, la cantidad de copias podría ser 2 o 2.5 veces esa estimación. Ahora el número no es una cantidad. Es una tasa, y ya no está en el mismo orden de magnitud que la capacidad de una sola empresa. Akamai, uno de los CDNs más grandes en gaming, reportó picos cercanos a 396 Tbps en 2025, con una capacidad de más de 1.000 Tbps. La estimación de 555 Tbps ya es más de la mitad de eso. El escenario récord está por encima. Ningún CDN solo carga con esto. Por eso la arquitectura es plural por defecto.
+Y si el lanzamiento es un récord, la cantidad de copias podría ser 2 o 2.5 veces esa estimación. Ahora el número no es una cantidad. Es una tasa. Akamai, uno de los CDNs más grandes en gaming, reportó picos cercanos a 396 Tbps en 2025, con una capacidad de más de 1.000 Tbps. La estimación de 555 Tbps ya es más de la mitad de eso. El escenario récord está por encima. Ningún CDN solo carga con esto. Por eso la arquitectura es plural por defecto.
 
-![lo que importa es la curva de llegada, no los dos exabytes: el pico supera la capacidad de un solo CDN](./arrival-curve.svg)
+![el mismo total, otra llegada: el pico front-loaded llega a 555 Tbps, por encima del pico de 396 Tbps de toda la red de Akamai en 2025](./arrival-curve.svg)
 
 Esto es lo primero que enseña el lanzamiento: un sistema dimensionado para el promedio colapsa en el pico. El promedio es un número cómodo. El pico es el que llega.
 
@@ -93,7 +93,7 @@ Ahora llega un pico de 15.000 requests por segundo y dura diez segundos. La base
 50.000 / 10.000 = 5 s
 ```
 
-Pero las llegadas no se detienen. Si siguen llegando a 15.000 por segundo, la cola no drena. Crece. La espera crece con ella. Esta es la parte que la gente se pierde de las colas: no cancelan un pico, lo almacenan. Te compran tiempo, y solo te lo devuelven si la tasa de llegada cae por debajo de la tasa de servicio. Si no cae, la cola es solo una forma más lenta de fallar.
+Pero las llegadas no se detienen. Si siguen llegando a 15.000 por segundo, la cola no drena. Crece. La espera crece con ella. Little's Law nombra esa relación: la cantidad de requests en el sistema es la tasa de llegada por el tiempo que cada uno pasa ahí. Mantené las llegadas por encima de la tasa de servicio y la cola y la espera crecen juntas. Esta es la parte que la gente se pierde de las colas: no cancelan un pico, lo almacenan. Te compran tiempo, y solo te lo devuelven si la tasa de llegada cae por debajo de la tasa de servicio. Si no cae, la cola es solo una forma más lenta de fallar.
 
 Por eso una cola nunca alcanza por sí sola. También necesitás backpressure: retries con exponential backoff, jitter, un header `Retry-After`, rate limiting, circuit breakers. El cliente tiene que frenar, y el servidor tiene que hacerlo cumplir, porque no podés confiar en que el cliente respete una pausa que no puede ver. La cola es el buffer. El backpressure es la válvula.
 
@@ -105,7 +105,7 @@ En el momento en que el request depende de quién sos, la fotocopiadora se detie
 
 Esta es la hard dependency. La descarga puede terminar perfecto y el juego igual no arranca, porque el servicio que verifica si lo compraste está caído. O porque los servidores de login del estudio están caídos. El Error 37 de Diablo III es la versión canónica: el juego estaba instalado, los servidores no dejaban entrar a nadie. El flujo estático estaba bien. El núcleo stateful era la falla.
 
-El marco de flujo explica la capa estática. Acá se rompe. No podés cachear un permiso de la misma forma en que cacheás un archivo. Podés cachearlo por un tiempo, pero el cache tiene que expirar, y cuando expira, la respuesta tiene que ser correcta. Podés encolar el chequeo, pero ahora la cola está en el critical path: el jugador no puede arrancar hasta que el chequeo se resuelva. Podés aplicar throttling a la descarga, pero no podés aplicar throttling a un login de la misma forma, porque el usuario no está esperando bytes; está esperando jugar.
+El marco de flujo explica la capa estática. Acá se rompe. No podés cachear un permiso de la misma forma en que cacheás un archivo. Podés cachearlo por un tiempo, pero el cache tiene que expirar, y cuando expira, la respuesta tiene que ser correcta. Podés encolar el chequeo, pero ahora la cola está en el critical path: el jugador no puede arrancar hasta que el chequeo se resuelva. Podés aplicar throttling a la descarga y también a un login, pero no son el mismo tipo de espera. Hacer throttling de bytes es invisible: la descarga solo tarda más. Hacer throttling de un login queda en el critical path, porque el usuario no está esperando bytes; está esperando jugar.
 
 El principio de diseño es achicar el núcleo. Casi todo debería ser una soft dependency: si falla la telemetry, el juego sigue; si falla el feed de noticias, el juego sigue; si falla la lista de amigos, el juego sigue. Las hard dependencies son las pocas cosas que tienen que estar correctas para que el juego arranque: entitlement, login, la compra misma. Esas llevan la redundancia, la strong consistency y la atención de ingeniería. El resto lleva una cola y un encogimiento de hombros.
 

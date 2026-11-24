@@ -55,9 +55,9 @@ That's already a lot. But the traffic isn't spread evenly. A launch is front-loa
 69.44 TB/s × 8 ≈ 555 Tbps
 ```
 
-And if the launch is a record, the number of copies could be 2 or 2.5 times that estimate. Now the number is not a quantity. It's a rate, and it's no longer in the same order of magnitude as a single company's capacity. Akamai, one of the biggest CDNs in gaming, reported peaks near 396 Tbps in 2025, with a capacity of more than 1.000 Tbps. The 555 Tbps estimate is already more than half of that. The record scenario is above it. No single CDN carries this alone. That's why the architecture is plural by default.
+And if the launch is a record, the number of copies could be 2 or 2.5 times that estimate. Now the number is not a quantity. It's a rate. Akamai, one of the biggest CDNs in gaming, reported peaks near 396 Tbps in 2025, with a capacity of more than 1.000 Tbps. The 555 Tbps estimate is already more than half of that. The record scenario is above it. No single CDN carries this alone. That's why the architecture is plural by default.
 
-![the arrival curve matters, not the two exabytes: the front-loaded peak sits above one CDN's ceiling](./arrival-curve.svg)
+![same total, different arrival: the front-loaded peak reaches 555 Tbps, above Akamai's 2025 network-wide peak of 396 Tbps](./arrival-curve.svg)
 
 This is the first thing the launch teaches: a system sized for the average collapses at the peak. The average is a comfortable number. The peak is the one that arrives.
 
@@ -99,7 +99,7 @@ Now a peak arrives at 15.000 requests per second and lasts ten seconds. The data
 50.000 / 10.000 = 5 s
 ```
 
-But the arrivals don't stop. If they keep coming at 15.000 per second, the queue doesn't drain. It grows. The wait grows with it. This is the part people miss about queues: they don't cancel a peak, they store it. They buy you time, and they only pay it back if the arrival rate falls below the service rate. If it doesn't, the queue is just a slower way to fail.
+But the arrivals don't stop. If they keep coming at 15.000 per second, the queue doesn't drain. It grows. The wait grows with it. Little's Law names the relationship: the number of requests in the system is the arrival rate times the time each one spends there. Keep arrivals above the service rate and the queue and the wait climb together. This is the part people miss about queues: they don't cancel a peak, they store it. They buy you time, and they only pay it back if the arrival rate falls below the service rate. If it doesn't, the queue is just a slower way to fail.
 
 That's why a queue is never enough on its own. You also need backpressure: retries with exponential backoff, jitter, a `Retry-After` header, rate limiting, circuit breakers. The client has to slow down, and the server has to enforce it, because you can't trust the client to respect a pause it can't see. The queue is the buffer. The backpressure is the valve.
 
@@ -111,7 +111,7 @@ The moment the request depends on who you are, the copy machine stops. Did you b
 
 This is the hard dependency. The download can finish perfectly and the game still won't start, because the service that checks whether you own it is down. Or because the developer's login servers are down. Diablo III's Error 37 is the canonical version: the game was installed, the servers were not letting anyone in. The static flow was fine. The stateful core was the failure.
 
-The flow frame explains the static layer. It breaks here. You can't cache a permission the way you cache a file. You can cache it for a while, but the cache has to expire, and when it does, the answer has to be correct. You can queue the check, but now the queue is in the critical path: the player can't start until the check resolves. You can throttle the download, but you can't throttle a login the same way, because the user isn't waiting for bytes; they're waiting to play.
+The flow frame explains the static layer. It breaks here. You can't cache a permission the way you cache a file. You can cache it for a while, but the cache has to expire, and when it does, the answer has to be correct. You can queue the check, but now the queue is in the critical path: the player can't start until the check resolves. You can throttle the download, and you can throttle a login too, but they aren't the same kind of wait. Throttling bytes is invisible: the download just takes longer. Throttling a login sits in the critical path, because the user isn't waiting for bytes; they're waiting to play.
 
 The design principle is to shrink the hard core. Almost everything should be a soft dependency: if telemetry fails, the game still runs; if the news feed fails, the game still runs; if the friends list fails, the game still runs. The hard dependencies are the few things that must be correct for the game to start at all: entitlement, login, the purchase itself. Those get the redundancy, the strong consistency, and the engineering attention. The rest gets a queue and a shrug.
 
