@@ -1,0 +1,40 @@
+<svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace">
+  <rect x="0" y="0" width="680" height="360" rx="10" fill="#141C24" />
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#9FB8CE" />
+    </marker>
+    <marker id="arrow-mint" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4EC8A0" />
+    </marker>
+  </defs>
+
+  <text font-weight="300" x="40" y="38" font-size="12" fill="#9FB8CE">same file, many places</text>
+
+  <!-- origin -->
+  <rect x="40" y="140" width="140" height="76" rx="10" fill="none" stroke="#C9D67B" stroke-width="1" />
+  <text font-weight="300" x="110" y="168" text-anchor="middle" font-size="13" fill="#C9D67B">origin</text>
+  <text font-weight="300" x="110" y="192" text-anchor="middle" font-size="11" fill="#C9D67B">one 200 GB file</text>
+
+  <!-- copies -->
+  <line x1="186" y1="178" x2="294" y2="74" stroke="#9FB8CE" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="186" y1="178" x2="294" y2="164" stroke="#9FB8CE" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow)" />
+  <line x1="186" y1="178" x2="294" y2="254" stroke="#9FB8CE" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow)" />
+
+  <rect x="300" y="50" width="160" height="48" rx="10" fill="none" stroke="#9FB8CE" stroke-width="1" />
+  <text font-weight="300" x="380" y="74" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#9FB8CE">PoP</text>
+
+  <rect x="300" y="140" width="160" height="48" rx="10" fill="none" stroke="#4EC8A0" stroke-width="1" />
+  <text font-weight="300" x="380" y="164" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#4EC8A0">nearest PoP</text>
+
+  <rect x="300" y="230" width="160" height="48" rx="10" fill="none" stroke="#9FB8CE" stroke-width="1" />
+  <text font-weight="300" x="380" y="254" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#9FB8CE">PoP</text>
+
+  <!-- console pulls from the closest copy -->
+  <line x1="466" y1="164" x2="524" y2="164" stroke="#4EC8A0" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow-mint)" />
+  <rect x="530" y="140" width="110" height="48" rx="10" fill="none" stroke="#9FB8CE" stroke-width="1" />
+  <text font-weight="300" x="585" y="164" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#9FB8CE">console</text>
+
+  <text font-weight="300" x="40" y="325" font-size="12" fill="#E8E6E1">bytes travel less. total bytes unchanged.</text>
+</svg>
