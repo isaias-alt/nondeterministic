@@ -34,7 +34,7 @@ Take GTA 6: ten million copies on day one, around 210 GB each. Multiply it out:
 
 ```text
 10.000.000 copies × 210 GB = 2.100.000.000 GB
-2.100.000.000 GB = 2.100.000 TB = 2.100 PB = 2.1 EB
+2.100.000.000 GB = 2.100.000 TB = 2.100 PB = 2,1 EB
 ```
 
 Two exabytes. That's the number everyone calculates. It's also the wrong number.
