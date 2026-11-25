@@ -30,34 +30,34 @@ You've probably fixed this before. You didn't add a bigger server. You added a c
 
 Now scale that line of code to a game launch.
 
-Take GTA 6: ten million copies on day one, around 200 GB each. Multiply it out:
+Take GTA 6: ten million copies on day one, around 210 GB each. Multiply it out:
 
 ```text
-10.000.000 copies × 200 GB = 2.000.000.000 GB
-2.000.000.000 GB = 2.000.000 TB = 2.000 PB = 2 EB
+10.000.000 copies × 210 GB = 2.100.000.000 GB
+2.100.000.000 GB = 2.100.000 TB = 2.100 PB = 2.1 EB
 ```
 
 Two exabytes. That's the number everyone calculates. It's also the wrong number.
 
 Two exabytes is a quantity. Quantities don't take down systems. Rates do.
 
-Spread those two exabytes over the first 24 hours and you get:
+Spread those 2.1 exabytes over the first 24 hours and you get:
 
 ```text
-2.000.000 TB / 86.400 s ≈ 23.15 TB/s
-23.15 TB/s × 8 ≈ 185 Tbps
+2.100.000 TB / 86.400 s ≈ 24.31 TB/s
+24.31 TB/s × 8 ≈ 194 Tbps
 ```
 
 That's already a lot. But the traffic isn't spread evenly. A launch is front-loaded: most people try to download the moment the game unlocks. If half the downloads happen in the first four hours:
 
 ```text
-1.000.000 TB / 14.400 s ≈ 69.44 TB/s
-69.44 TB/s × 8 ≈ 555 Tbps
+1.050.000 TB / 14.400 s ≈ 72.92 TB/s
+72.92 TB/s × 8 ≈ 583 Tbps
 ```
 
-And if the launch is a record, the number of copies could be 2 or 2.5 times that estimate. Now the number is not a quantity. It's a rate. Akamai, one of the biggest CDNs in gaming, reported peaks near 396 Tbps in 2025, with a capacity of more than 1.000 Tbps. The 555 Tbps estimate is already more than half of that. The record scenario is above it. No single CDN carries this alone. That's why the architecture is plural by default.
+And if the launch is a record, the number of copies could be 2 or 2.5 times that estimate. Now the number is not a quantity. It's a rate. Akamai, one of the biggest CDNs in gaming, reported peaks near 396 Tbps in 2025, with a capacity of more than 1.000 Tbps. The 583 Tbps estimate is already more than half of that. The record scenario is above it. No single CDN carries this alone. That's why the architecture is plural by default.
 
-![same total, different arrival: the front-loaded peak reaches 555 Tbps, above Akamai's 2025 network-wide peak of 396 Tbps](./arrival-curve.svg)
+![same total, different arrival: the front-loaded peak reaches 583 Tbps, above Akamai's 2025 network-wide peak of 396 Tbps](./arrival-curve.svg)
 
 This is the first thing the launch teaches: a system sized for the average collapses at the peak. The average is a comfortable number. The peak is the one that arrives.
 

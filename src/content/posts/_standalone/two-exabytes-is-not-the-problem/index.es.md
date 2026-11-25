@@ -24,34 +24,34 @@ Ya habrás arreglado esto alguna vez. No agregaste un servidor más grande. Agre
 
 Ahora escalá esa línea de código a un lanzamiento de juego.
 
-Tomá GTA 6: diez millones de copias el día uno, alrededor de 200 GB cada una. Multiplicalo:
+Tomá GTA 6: diez millones de copias el día uno, alrededor de 210 GB cada una. Multiplicalo:
 
 ```text
-10.000.000 copias × 200 GB = 2.000.000.000 GB
-2.000.000.000 GB = 2.000.000 TB = 2.000 PB = 2 EB
+10.000.000 copias × 210 GB = 2.100.000.000 GB
+2.100.000.000 GB = 2.100.000 TB = 2.100 PB = 2.1 EB
 ```
 
 Dos exabytes. Ese es el número que todos calculan. También es el número equivocado.
 
 Dos exabytes es una cantidad. Las cantidades no tumban sistemas. Las tasas sí.
 
-Repartí esos dos exabytes en las primeras 24 horas y te da:
+Repartí esos 2.1 exabytes en las primeras 24 horas y te da:
 
 ```text
-2.000.000 TB / 86.400 s ≈ 23.15 TB/s
-23.15 TB/s × 8 ≈ 185 Tbps
+2.100.000 TB / 86.400 s ≈ 24.31 TB/s
+24.31 TB/s × 8 ≈ 194 Tbps
 ```
 
 Eso ya es mucho. Pero el tráfico no se reparte parejo. Un lanzamiento es front-loaded: la mayoría intenta descargar en el momento en que el juego se desbloquea. Si la mitad de las descargas pasa en las primeras cuatro horas:
 
 ```text
-1.000.000 TB / 14.400 s ≈ 69.44 TB/s
-69.44 TB/s × 8 ≈ 555 Tbps
+1.050.000 TB / 14.400 s ≈ 72.92 TB/s
+72.92 TB/s × 8 ≈ 583 Tbps
 ```
 
-Y si el lanzamiento es un récord, la cantidad de copias podría ser 2 o 2.5 veces esa estimación. Ahora el número no es una cantidad. Es una tasa. Akamai, uno de los CDNs más grandes en gaming, reportó picos cercanos a 396 Tbps en 2025, con una capacidad de más de 1.000 Tbps. La estimación de 555 Tbps ya es más de la mitad de eso. El escenario récord está por encima. Ningún CDN solo carga con esto. Por eso la arquitectura es plural por defecto.
+Y si el lanzamiento es un récord, la cantidad de copias podría ser 2 o 2.5 veces esa estimación. Ahora el número no es una cantidad. Es una tasa. Akamai, uno de los CDNs más grandes en gaming, reportó picos cercanos a 396 Tbps en 2025, con una capacidad de más de 1.000 Tbps. La estimación de 583 Tbps ya es más de la mitad de eso. El escenario récord está por encima. Ningún CDN solo carga con esto. Por eso la arquitectura es plural por defecto.
 
-![el mismo total, otra llegada: el pico front-loaded llega a 555 Tbps, por encima del pico de 396 Tbps de toda la red de Akamai en 2025](./arrival-curve.svg)
+![el mismo total, otra llegada: el pico front-loaded llega a 583 Tbps, por encima del pico de 396 Tbps de toda la red de Akamai en 2025](./arrival-curve.svg)
 
 Esto es lo primero que enseña el lanzamiento: un sistema dimensionado para el promedio colapsa en el pico. El promedio es un número cómodo. El pico es el que llega.
 
