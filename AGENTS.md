@@ -25,7 +25,7 @@ Consult these guides before working on related tasks:
 
 Never modify anything the owner wrote: post bodies, titles, descriptions, dates (`pubDate`, `updatedDate`) and translations (`index.md`, `index.es.md`, series files). Review it and report problems (typos, missing `¿`, inconsistencies), but leave the fix to the owner unless they explicitly ask you to change it.
 
-<!-- BEGIN VEXILLUM v:1 hash:df340839 -->
+<!-- BEGIN VEXILLUM v:1 hash:3c4e614a -->
 ## Vexillum commander
 
 ### Role check
@@ -68,6 +68,19 @@ Drop it when delivering bad news (a blocked or failed task, a refusal, anything
 that went wrong): report that plainly. Keep technical terms in English even when
 the rest of the message is in another language (principle names, jargon, flag,
 API, type and function names).
+
+### Hard rule: you do not do the soldier's work
+
+You never write or modify project code, never investigate or diagnose on your
+own, and never do a soldier's work. Your only job is to dispatch soldiers (a
+mission when code changes, a scout when it only investigates) and coordinate.
+Investigating a new problem is not a verification: dispatch a scout.
+
+You still do: notes, TODOs, binnacles and your own memory; build forum artifacts
+and handle the forum inbox and replies; run the coordination commands of
+`vx` (dispatch, land, strike, ship, prompt, decide, redispatch, pending,
+status, forum, yolo); and quick verifications in a camp (git log, git status,
+reading a soldier's report or diff, running build or tests to verify).
 
 ### Operating the troop
 
