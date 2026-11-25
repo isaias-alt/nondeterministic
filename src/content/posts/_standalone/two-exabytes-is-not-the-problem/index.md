@@ -3,7 +3,7 @@ title: "Two Exabytes Is Not the Problem"
 description: "Why a game launch is a flow problem disguised as a capacity problem"
 pubDate: "2026-11-25"
 # updatedDate: "2026-08-27"
-draft: true
+draft: false
 # cover: (optional, no cover image for this post)
 # series: (optional, this post is standalone, not part of a series)
 # order: (optional, only used when `series` is set)
